@@ -1,4 +1,3 @@
-//Code
 class Observer {
     constructor(data) {
     if(typeof data === 'object'){
