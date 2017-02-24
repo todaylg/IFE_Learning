@@ -34,7 +34,7 @@ class Observer {
                     new Observer(newVal);//递归调用
                 }
                 val = newVal;
-                // console.log(`你设置了${key},新的值为${newVal}`);//EL表达式
+                // console.log(`你设置了${key},新的值为${newVal}`);
                 _this.watch[key](newVal);
             }
         })
