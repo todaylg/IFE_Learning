@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Course1</title>
+</head>
+<body>
+	<h1>请将一下代码复制到控制台</h1>
+	<pre>
+		var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+			// 观察者构造函数
+			function Observer(data) {
+			    if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
+			        this.data = data;
+			        this.walk(data);
+			    } else {
+			        console.log('请传入对象');
+			    }
+			}
+
+			var p = Observer.prototype;
+
+			// 此函数用于深层次遍历对象的各个属性
+			// 采用的是递归的思路
+			// 因为我们要为对象的每一个属性绑定getter和setter
+			p.walk = function (obj) {
+			    var val = void 0;
+			    for (var key in obj) {
+			        // 这里为什么要用hasOwnProperty进行过滤呢？
+			        // 因为for...in 循环会把对象原型链上的所有可枚举属性都循环出来
+			        // 而我们想要的仅仅是这个对象本身拥有的属性，所以要这么做。
+			        if (obj.hasOwnProperty(key)) {
+			            val = obj[key];
+
+			            // 这里进行判断，如果还没有遍历到最底层，继续new Observer
+			            if ((typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object') {
+			                new Observer(val);
+			            }
+
+			            this.convert(key, val);
+			        }
+			    }
+			};
+
+			p.convert = function (key, val) {
+			    //Object.defineProperty() 方法会直接在一个对象上定义一个新属性，或者修改一个已经存在的属性， 并返回这个对象。
+			    //Object.defineProperty(obj, prop, descriptor) obj:需要定义属性的对象。prop:需定义或修改的属性的名字。descriptor:将被定义或修改的属性的描述符。
+			    Object.defineProperty(this.data, key, { //因为要求是data 属性要能够访问到传递进去的对象。
+			        enumerable: true, //当且仅当该属性的 enumerable 为 true 时，该属性才能够出现在对象的枚举属性中。默认为 false。
+			        configurable: true, //当且仅当该属性的 configurable 为 true 时，该属性描述符才能够被改变，也能够被删除。默认为 false。
+			        get: function get() {
+			            console.log('你访问了' + key);
+			            return val;
+			        },
+			        set: function set(newVal) {
+			            console.log('你设置了' + key);
+			            console.log('新的' + key + ' 新的值为 ' + newVal);
+			            if (newVal === val) return;
+			            val = newVal;
+			        }
+			    });
+			};
+			var app1 = new Observer({
+			    name: 'youngwind',
+			    age: 25
+			});
+
+			var app2 = new Observer({
+			    university: 'bupt',
+			    major: 'computer'
+			});
+	</pre>
+	<h1>要实现的结果如下：</h1>
+		<h2> 输入：app1.data.name 输出：你访问了 name</h2>
+		 <h2> 输入：app1.data.age = 100; 输出： 你设置了 age，新的值为100</h2>
+		 <h2> 输入：app2.data.university 输出： 你访问了 university</h2>
+		 <h2> 输入：app2.data.major = 'science'  输出： 你设置了 major，新的值为 science</h2>
+	</h1>
+</body>
+</html>
