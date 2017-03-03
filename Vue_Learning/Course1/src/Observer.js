@@ -1,21 +1,19 @@
-class Observer {
-    constructor(data) {
-    if(typeof data === 'object'){
-        this.data = data
-        this.walk(this.data)
-    }else{
-        console.log('请传入对象')
-    }
-}
-
-    walk(obj) {
+var Observer = {
+    init:function(data){
+        this.data = data;
+        if(typeof data === 'object'){
+            this.walk(data)
+        }else{
+            console.log('请传入对象')
+        }
+    },
+   walk:function(obj) {
         let keys = Object.keys(obj)//返回该对象的所有可枚举自身属性的属性名。
         for (var i = 0; i < keys.length; i++) {
             this.convert(keys[i], obj[keys[i]])
         }
-    }
-
-    convert(key, val) {
+    },
+    convert:function(key, val) {
         Object.defineProperty(this.data, key, {
             enumerable: true,
             configurable: true,
@@ -32,12 +30,14 @@ class Observer {
     }
 }
 
-let app1 = new Observer({
-  name: 'youngwind',
-  age: 25
-});
-
-let app2 = new Observer({
-  university: 'bupt',
+  
+var app1 = Object.create(Observer);
+    app1.init({
+        name: 'youngwind',
+        age: 25
+    }) 
+var app2 = Object.create(Observer);
+    app2.init({
+         university: 'bupt',
   major: 'computer'
-});
+    }) 
