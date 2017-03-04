@@ -69,75 +69,61 @@
 /******/ ([
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 //Code
-var Observer = function () {
-    function Observer(data) {
-        _classCallCheck(this, Observer);
-
+var Observer = {
+    init: function init(data) {
+        this.data = data;
+        this.watch = {};
         if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) === 'object') {
-            this.data = data;
-            this.walk(this.data);
-            this.watch = {};
+            this.walk(data);
         } else {
             console.log('请传入对象');
         }
-    }
-
-    _createClass(Observer, [{
-        key: 'walk',
-        value: function walk(obj) {
-            var keys = Object.keys(obj); //返回该对象的所有可枚举自身属性的属性名。
-            for (var i = 0; i < keys.length; i++) {
-                this.convert(keys[i], obj[keys[i]]);
-                if (_typeof(obj[keys[i]]) === 'object') {
-                    //递归调用。从而给所有对象的属性都添加get、set
-                    new Observer(obj[keys[i]]);
-                }
+    },
+    walk: function walk(obj) {
+        var keys = Object.keys(obj); //返回该对象的所有可枚举自身属性的属性名。
+        for (var i = 0; i < keys.length; i++) {
+            this.convert(keys[i], obj[keys[i]]);
+            if (_typeof(obj[keys[i]]) === 'object') {
+                //递归调用。从而给所有对象的属性都添加get、set
+                var a = Object.create(Observer);
+                a.init(obj[keys[i]]);
             }
         }
-    }, {
-        key: 'convert',
-        value: function convert(key, val) {
-            var _this = this;
-            Object.defineProperty(this.data, key, {
-                enumerable: true,
-                configurable: true,
-                get: function get() {
-                    console.log('你访问了' + key);
-                    return val;
-                },
-                set: function set(newVal) {
-                    if (newVal === val) return;
-                    if ((typeof newVal === 'undefined' ? 'undefined' : _typeof(newVal)) === 'object') {
-                        new Observer(newVal); //递归调用
-                    }
-                    val = newVal;
-                    // console.log(`你设置了${key},新的值为${newVal}`);//EL表达式
-                    _this.watch[key](newVal);
+    },
+    convert: function convert(key, val) {
+        var _this = this;
+        Object.defineProperty(this.data, key, {
+            enumerable: true,
+            configurable: true,
+            get: function get() {
+                console.log('你访问了' + key);
+                return val;
+            },
+            set: function set(newVal) {
+                if (newVal === val) return;
+                if ((typeof newVal === 'undefined' ? 'undefined' : _typeof(newVal)) === 'object') {
+                    var a = Object.create(Observer);
+                    a.init(newVal);
                 }
-            });
-        }
-    }, {
-        key: '$watch',
-        value: function $watch(val, callback) {
-            this.watch[val] = callback;
-        }
-    }]);
+                val = newVal;
+                // console.log(`你设置了${key},新的值为${newVal}`);//EL表达式
+                _this.watch[key](newVal); //对象
+            }
+        });
+    },
+    $watch: function $watch(val, callback) {
+        this.watch[val] = callback;
+    }
+};
 
-    return Observer;
-}();
-
-var app1 = new Observer({
+var app1 = Object.create(Observer);
+app1.init({
     name: 'youngwind',
     age: 25
 });
