@@ -49,7 +49,7 @@ var Vue = {
         
     },
     circle:function(str,val){//迭代完成字符串拼接
-         if(val&&val.parentObj.parentName!='data'){//没到头
+         if(val&&val.parentObj&&val.parentName!='data'){//没到头
             str = ('.'+val.parentName+str);
             //迭代
             this.circle(val.parentObj);
