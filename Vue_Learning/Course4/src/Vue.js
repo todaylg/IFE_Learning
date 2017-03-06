@@ -30,8 +30,6 @@ var Vue = {
         }
     },
     convert:function(key, val) {
-        console.log("key: "+key);
-        console.log("val: "+val);
         var key_val = false;
         var keys = Object.keys(val)
         for(var i = 0;i<keys.length;i++){
@@ -42,17 +40,15 @@ var Vue = {
         if(key_val){
             var str = ("."+key);
             //迭代
-            console.log(str);
             str = this.circle(str,val);
             //去掉最前面多的"."
             str = str.substr(1);
-            console.log("str: "+str);
             //收集所有要修改的地方，避免多次操作DOM
             this.Vue_obj[str] = val.Vue_value;
         }
         
     },
-    circle:function(str,val){
+    circle:function(str,val){//迭代完成字符串拼接
          if(val&&val.parentObj.parentName!='data'){//没到头
             str = ('.'+val.parentName+str);
             //迭代
@@ -66,9 +62,6 @@ var Vue = {
         for(var i = 0;i<keys.length;i++){
             //动态生成正则表达式直接修改字符串
             var reg = new RegExp("\{\{"+keys[i]+"\}\}","gm");
-            console.log("reg :"+reg);
-            console.log("elString :"+ elString);
-            console.log("obj[keys[i]] :"+obj[keys[i]]);
             elString = elString.replace(reg,obj[keys[i]]);//替换为输入的值
         }
         this.el.innerHTML = '';//先删除节点

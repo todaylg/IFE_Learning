@@ -107,8 +107,6 @@ var Vue = {
         }
     },
     convert: function convert(key, val) {
-        console.log("key: " + key); //user name age
-        console.log("val: " + val);
         var key_val = false;
         var keys = Object.keys(val);
         for (var i = 0; i < keys.length; i++) {
@@ -119,11 +117,9 @@ var Vue = {
         if (key_val) {
             var str = "." + key;
             //迭代
-            console.log(str);
             str = this.circle(str, val);
             //去掉最前面多的"."
             str = str.substr(1);
-            console.log("str: " + str);
             //收集所有要修改的地方，避免多次操作DOM
             this.Vue_obj[str] = val.Vue_value;
         }
@@ -143,9 +139,6 @@ var Vue = {
         for (var i = 0; i < keys.length; i++) {
             //动态生成正则表达式直接修改字符串
             var reg = new RegExp("\{\{" + keys[i] + "\}\}", "gm");
-            console.log("reg :" + reg);
-            console.log("elString :" + elString);
-            console.log("obj[keys[i]] :" + obj[keys[i]]);
             elString = elString.replace(reg, obj[keys[i]]); //替换为输入的值
         }
         this.el.innerHTML = '';
@@ -158,10 +151,6 @@ var Vue = {
         }
     }
 };
-
-// var test = "dsadas{asd}dsada{{user.name}}dsadsa{{abc}}";
-// var reg = new RegExp("\{\{(.+?)\}\}","gm");
-// test.replace(reg,"LG");
 
 /***/ })
 /******/ ]);
