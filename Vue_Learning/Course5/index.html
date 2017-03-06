@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course5</title>
+</head>
+<body>
+    <div id="app">
+        <p>姓名：{{user.name}}</p>
+        <p>年龄：{{user.age}}</p>
+    </div>
+    <br>
+    <h1>请将以下代码复制到控制台</h1>
+    <pre>
+var Vue = {
+    init:function(obj){
+        this.el = document.querySelector(obj.el);
+        this.elString = this.el.innerHTML;
+        this.Vue_obj = {};
+        this.data = obj.data;
+        this.walk("data",obj.data);
+    },
+   walk:function(key,obj) {
+        this.addParent(key,obj);
+    },
+    addParent:function(key,obj){
+        var keys = Object.keys(obj)//返回该对象的所有可枚举自身属性的属性名。
+        for (var i = 0; i < keys.length; i++) {  
+            if(typeof obj[keys[i]] === 'object'){
+                this.addParent(keys[i],obj[keys[i]]);
+                obj[keys[i]].parentName = key;
+                obj[keys[i]].parentObj = obj;
+            }else{
+               var value = obj[keys[i]];
+                obj[keys[i]] = {
+                    Vue_value: value,
+                    parentName: key,
+                    parentObj:obj
+                };
+            }
+            this.addEvent(keys[i], obj[keys[i]])
+        }
+    },
+    addEvent:function(key,val){
+        var _this = this;
+        if(val&&val.parentObj&&val.parentName =='data'){//第一级对象
+            Object.defineProperty(_this.data, key, {
+                enumerable: true,
+                configurable: true,
+                get() {
+                    console.log('你访问了' + key);
+                    return val
+                },
+                set(newVal) {
+                    if (newVal === val.Vue_value) return;
+                    val.Vue_value = newVal;
+                    _this.convert(key,val);
+                }
+            });
+        }else if(val&&val.parentObj&&val.parentName !='data'){//深对象
+            Object.defineProperty(val.parentObj, key, {
+                enumerable: true,
+                configurable: true,
+                get() {
+                    console.log('你访问了' + key);
+                    return val.Vue_value
+                },
+                set(newVal) {
+                    if (newVal === val.Vue_value) return;
+                    val.Vue_value = newVal;
+                    _this.convert(key,val);
+                }
+            });
+        }
+    },
+    convert:function(key, val) {
+        var key_val = false;
+        var keys = Object.keys(val)
+        for(var i = 0;i< keys.length;i++){
+            if(keys[i] == 'Vue_value'){
+                key_val = true;
+            }
+        }
+        if(key_val){
+            var str = ("."+key);
+            //迭代
+            str = this.circle(str,val);
+            //去掉最前面多的"."
+            str = str.substr(1);
+            //收集所有要修改的地方，避免多次操作DOM
+            this.Vue_obj[str] = val.Vue_value;
+            this.changeDOM(this.Vue_obj);
+        }
+    },
+    circle:function(str,val){
+         if(val&&val.parentObj&&val.parentName!='data'){//没到头  
+            str = ('.'+val.parentName+str);
+            //迭代
+            this.circle(val.parentObj);
+        }
+        return str;
+    },
+    changeDOM:function(obj){
+        var keys = Object.keys(obj);
+        var elString = this.el.innerHTML.replace(/^\s*|\s*$/g, "");//去掉返回值里的空格
+        var tempString;
+        for(var i = 0;i< keys.length;i++){
+            //动态生成正则表达式直接修改字符串
+            var reg = new RegExp("\{\{"+keys[i]+"\}\}","gm");
+            tempString = elString.replace(reg,obj[keys[i]]);//替换为输入的值
+        }
+        if(elString == tempString){//添加一次对比，没有改动就不渲染DOM
+            console.log('DOM较之前没有更改，不用重新渲染！');
+        }else{
+            this.el.innerHTML = '';
+            this.el.insertAdjacentHTML('afterbegin',tempString);
+        }
+    }
+}
+        var app = Object.create(Vue);
+                    app.init({
+                        el: '#app',
+                        data: {
+                             user: {
+                              name: 'youngwind',
+                              age: 25
+                            },
+                            school: 'bupt',
+                            major: 'computer'
+                        }
+                    })
+
+    </pre>
+    <h1>要实现的结果如下：</h1>
+        <h2> 输入：app.data.school = 'lol'</h2>
+         <h2> 输入：app.data.user.name = "LG"</h2>
+    <script type="text/javascript" src='src/Vue.js'></script>
+    <script>
+        // 这是“动态数据绑定”的最后一题了，希望你能坚持到最后。在第四题的基础上，我们考虑如何做到："当数据发生改变时，重新渲染 DOM。" 此目标又可以分为两层难度。
+
+        // 相对简单的目标：数据任意部分发生了变化，都重新渲染 DOM。
+        // 相对困难的目标：数据的某一部分发生了变动，只重新渲染对应这部分数据的 DOM。
+        // 举个例子。
+
+        // let app = new Vue({
+        //   el: '#app',
+        //   data: {
+        //     user: {
+        //       name: 'youngwind',
+        //       age: 25
+        //     },
+        //     school: 'bupt',
+        //     major: 'computer'
+        //   }
+        // });
+        // <!-- 页面中原本的 html 模板片段 -->
+        // <div id="app">
+        //     <p>姓名：{{user.name}}</p>
+        //     <p>年龄：{{user.age}}</p>
+        // </div>
+        // 相对简单的目标是说：无论是修改数据的哪一部分（包括没有在页面中出现的 school 和 major 这两部分），DOM 都会重新渲染。（即便前后渲染结果一致）
+        // 相对困难的目标是说：只有当 user.name 和 user.age 发生改变的时候，DOM 才会重新渲染；而 school 和 major 的变化不会引发重新渲染。
+
+        // 最后，无论你选择哪种难度，能完成本题，就已经很棒了！
+        (function(){
+            var app = Object.create(Vue);
+            app.init({
+                el: '#app',
+                data: {
+                     user: {
+                      name: 'youngwind',
+                      age: 25
+                    },
+                    school: 'bupt',
+                    major: 'computer'
+                }
+            })
+        })()
+        
+    </script>
+</body>
+</html>
