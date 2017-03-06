@@ -28,7 +28,7 @@ var Observer = {
     },
     convert:function(key, val) {
         var _this = this;
-        Object.defineProperty(_this[val.parentName], key, {
+        Object.defineProperty(val.parentObj, key, {
             enumerable: true,
             configurable: true,
             get() {
