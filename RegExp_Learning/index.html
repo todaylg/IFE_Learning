@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>RegExp_Learning</title>
+</head>
+<body>
+	<div style="text-align:center;margin-top:50px;">
+		<label for="task1_input">手机号码验证：</label>
+		<input type="text" id='task1_input'><button id="task1_button">验证</button>
+		<label for="task2_input">相邻重复字符串验证：</label>
+		<input type="text" id='task2_input'><button id="task2_button">验证</button>
+	</div>
+	<script>
+		var task1InPut = document.getElementById('task1_input');
+		var task2InPut = document.getElementById('task2_input');
+		var task1Btn = document.getElementById('task1_button');
+		var task2Btn = document.getElementById('task2_button');
+
+		task1Btn.addEventListener('click', function() {
+		    var val = task1InPut.value.trim();
+		    var reg = /^1[3-578]\d{9}$/;
+		    if(reg.test(val)){
+		    	alert('验证通过');
+		    }else{
+		    	alert('验证未通过');
+		    }
+		    task1InPut.value = '';
+		});
+
+		task2Btn.addEventListener('click', function() {
+		    var val = task2InPut.value.trim();
+		    var reg = /\b([a-zA-Z]+)\b\s+\b\1\b/;
+		    if(reg.test(val)){
+		    	alert('验证通过');
+		    }else{
+		    	alert('验证未通过');
+		    }
+		    task2InPut.value = '';
+		});
+	</script>
+</body>
+</html>
